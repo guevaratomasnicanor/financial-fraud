@@ -1,41 +1,83 @@
-🛡️ Financial Fraud Detection: PaySim Analysis
-📌 Project Overview
-Este proyecto desarrolla un modelo de clasificación binaria para predecir transacciones fraudulentas en un sistema de pagos móviles. Utilizando el dataset sintético PaySim, el objetivo fue identificar patrones de comportamiento criminal en un mar de millones de transacciones legítimas.
+# 🛡️ Financial Fraud Detection — PaySim Analysis
 
-The Challenge
-El fraude financiero es un problema de "aguja en un pajar". En este dataset, las transacciones fraudulentas representan menos del 0.1% del total, lo que requiere un manejo cuidadoso del desbalance de clases y una selección precisa de variables.
+## 📌 Project Overview
+Este proyecto desarrolla un **modelo de clasificación binaria** para detectar transacciones fraudulentas en un sistema de pagos móviles.  
+Utilizando el dataset sintético **PaySim**, el objetivo es identificar patrones de fraude financiero en un entorno altamente desbalanceado, donde la gran mayoría de las transacciones son legítimas.
 
-🔍 Key Insights & Discovery
-A través de un Análisis Exploratorio de Datos (EDA) profundo, identificamos tres pilares que definen el fraude en este sistema:
+El enfoque combina **Análisis Exploratorio de Datos (EDA)**, **ingeniería de características basada en comportamiento** y **modelado supervisado**, priorizando métricas operativas relevantes para sistemas antifraude reales.
 
-Filtro de Canales: El 100% de los casos de fraude ocurren exclusivamente en los tipos TRANSFER y CASH_OUT. Las transacciones de tipo Payment o Debit no mostraron actividad maliciosa.
+---
 
-Correlación de Riesgo: Se observó que a mayor valor de la variable amount y en pasos temporales (step) más avanzados, la probabilidad de fraude aumenta.
+## ⚠️ The Challenge
+El fraude financiero es un problema clásico de **“aguja en un pajar”**:
 
-El Patrón "Zero Balance": Nuestro hallazgo más crítico. En prácticamente todas las transacciones fraudulentas, el saldo de la cuenta de origen (oldbalanceOrg) se transfiere íntegramente, dejando un newbalanceOrig de 0. Este comportamiento es extremadamente inusual en usuarios legítimos.
+- Las transacciones fraudulentas representan **menos del 0.1%** del total  
+- Un modelo naïve puede alcanzar alta accuracy ignorando el fraude  
+- El principal desafío es **maximizar el recall sin disparar falsos positivos**
 
-📊 Performance Metrics
-Gracias a la ingeniería de características basada en el vaciado de cuentas, logramos resultados operativos de alta eficiencia:
+Esto requiere:
+- Manejo cuidadoso del **desbalance de clases**
+- Selección inteligente de variables
+- Enfoque en **patrones de comportamiento**, no solo en montos
 
-Métrica	Resultado	Significado
-Recall (Sensibilidad)	98%	Capturamos casi la totalidad del fraude existente.
-Precisión	75%	Solo 1 de cada 4 alertas es un falso positivo, optimizando el tiempo de los analistas.
-🛠️ Data Dictionary
-El modelo analiza el flujo de dinero entre cuentas mediante las siguientes variables:
+---
 
-step: Unidad de tiempo (1 step = 1 hora de simulación).
+## 🔍 Key Insights & Discoveries
+A partir de un **EDA exhaustivo**, se identificaron tres pilares fundamentales que definen el fraude en este sistema:
 
-type: Tipo de transacción (CASH-IN, CASH-OUT, DEBIT, PAYMENT, TRANSFER).
+### 1️⃣ Channel Filtering
+- **100% del fraude ocurre en `TRANSFER` y `CASH_OUT`**
+- Tipos como `PAYMENT` y `DEBIT` no presentan actividad fraudulenta
+- Permite reducir significativamente el espacio de búsqueda del modelo
 
-amount: Monto de la transacción en moneda local.
+### 2️⃣ Risk Correlation
+- A mayor valor de `amount`, mayor probabilidad de fraude
+- El riesgo aumenta en **steps temporales más avanzados**
+- Sugiere un comportamiento progresivo del atacante
 
-oldbalanceOrg / newbalanceOrig: Saldo antes y después de la transacción (Origen).
+### 3️⃣ The “Zero Balance Pattern” (Hallazgo Clave)
+- En casi todas las transacciones fraudulentas:
+  - `oldbalanceOrg` se transfiere íntegramente
+  - `newbalanceOrig = 0`
+- Este **vaciado total de cuenta** es extremadamente inusual en usuarios legítimos
+- Se convierte en la **señal predictiva más fuerte del modelo**
 
-oldbalanceDest / newbalanceDest: Saldo antes y después de la transacción (Destino).
+---
 
-isFraud: Nuestra variable objetivo (Agente fraudulento tomando el control de la cuenta).
+## 📊 Model Performance
+Gracias a la ingeniería de características basada en el patrón de vaciado de cuentas, el modelo logra un desempeño altamente eficiente:
 
-🚀 Key Takeaway
-La lógica del fraude detectada es simple pero letal: El atacante intenta vaciar la cuenta de la víctima mediante una transferencia a una cuenta puente y luego realiza un Cash-out para liquidar los fondos. El modelo captura esta secuencia con una precisión superior a los sistemas de reglas tradicionales.
+| Métrica | Resultado | Significado |
+|------|---------|------------|
+| **Recall (Sensibilidad)** | **98%** | Captura casi la totalidad del fraude existente |
+| **Precisión** | **75%** | Solo 1 de cada 4 alertas es un falso positivo |
 
-¿Te gustaría que redacte también una sección sobre cómo manejar el desbalance de datos (como el uso de SMOTE o sub-sampling) para completar la parte técnica del README?
+👉 Este balance es ideal para entornos reales, donde **perder fraude es más costoso que investigar alertas**.
+
+---
+
+## 🛠️ Data Dictionary
+El modelo analiza el flujo de dinero entre cuentas utilizando las siguientes variables:
+
+| Variable | Descripción |
+|-------|------------|
+| `step` | Unidad temporal (1 step = 1 hora de simulación) |
+| `type` | Tipo de transacción (`CASH-IN`, `CASH-OUT`, `DEBIT`, `PAYMENT`, `TRANSFER`) |
+| `amount` | Monto de la transacción |
+| `oldbalanceOrg` | Saldo de la cuenta origen antes de la transacción |
+| `newbalanceOrig` | Saldo de la cuenta origen después de la transacción |
+| `oldbalanceDest` | Saldo de la cuenta destino antes de la transacción |
+| `newbalanceDest` | Saldo de la cuenta destino después de la transacción |
+| `isFraud` | Variable objetivo (1 = fraude, 0 = legítimo) |
+
+---
+
+## 🚀 Key Takeaway
+La lógica del fraude detectada es **simple pero letal**:
+
+> El atacante toma control de una cuenta, **la vacía completamente mediante una `TRANSFER`**, y luego ejecuta un **`CASH_OUT`** para liquidar los fondos.
+
+El modelo captura esta secuencia con una **precisión superior a los sistemas basados únicamente en reglas**, demostrando el valor del **análisis de comportamiento financiero** frente a enfoques tradicionales.
+
+---
+
