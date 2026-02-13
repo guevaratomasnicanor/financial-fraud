@@ -1,8 +1,3 @@
-Gemini said
-Este es un caso clásico basado en el dataset PaySim, y el hallazgo del "vaciado de cuenta" es precisamente lo que separa un modelo promedio de uno de alto rendimiento en este escenario.
-
-Aquí tienes una propuesta de reporte profesional, estructurada específicamente para un README.md de GitHub, con un enfoque en la narrativa de datos y los resultados métricos.
-
 🛡️ Financial Fraud Detection: PaySim Analysis
 📌 Project Overview
 Este proyecto desarrolla un modelo de clasificación binaria para predecir transacciones fraudulentas en un sistema de pagos móviles. Utilizando el dataset sintético PaySim, el objetivo fue identificar patrones de comportamiento criminal en un mar de millones de transacciones legítimas.
